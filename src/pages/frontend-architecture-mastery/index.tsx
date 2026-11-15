@@ -30,52 +30,7 @@ import {
   Star,
   ExternalLink
 } from 'lucide-react';
-
-/**
- * Custom IntersectionObserver hook for smooth scroll-reveal animations.
- */
-function useScrollReveal(threshold = 0.08) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(node);
-        }
-      },
-      { threshold }
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [threshold]);
-
-  return [ref, isVisible] as const;
-}
-
-/**
- * Smooth reveal wrapper for sections and cards.
- */
-function RevealSection({ children, className = '', delay = 0 }) {
-  const [ref, isVisible] = useScrollReveal(0.08);
-  return (
-    <div
-      ref={ref}
-      style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-700 ease-out ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-      } ${className}`}
-    >
-      {children}
-    </div>
-  );
-}
+import RevealSection from '../../shared/RevealSection';
 
 /**
  * Custom SVG Code-Bracket & Layer Brand Logo for CraftStack Academy

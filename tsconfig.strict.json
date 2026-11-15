@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strict": true
+  },
+  "include": [
+    "src/shared/RevealSection.tsx",
+    "src/pages/heliogrid-custom-solar/data.ts",
+    "src/pages/heliogrid-custom-solar/FaqSection.tsx"
+  ]
+}

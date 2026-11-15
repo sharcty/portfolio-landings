@@ -30,52 +30,9 @@ import {
   Wrench,
   Activity
 } from 'lucide-react';
-
-/**
- * Custom IntersectionObserver hook for smooth scroll-reveal animations.
- */
-function useScrollReveal(threshold = 0.08) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(node);
-        }
-      },
-      { threshold }
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [threshold]);
-
-  return [ref, isVisible] as const;
-}
-
-/**
- * Smooth reveal wrapper for sections and cards.
- */
-function RevealSection({ children, className = '', delay = 0 }) {
-  const [ref, isVisible] = useScrollReveal(0.08);
-  return (
-    <div
-      ref={ref}
-      style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-700 ease-out ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-      } ${className}`}
-    >
-      {children}
-    </div>
-  );
-}
+import RevealSection from '../../shared/RevealSection';
+import FaqSection from './FaqSection';
+import { solarTestimonials } from './data';
 
 /**
  * Custom Architectural Sun-Grid SVG Brand Logo for HelioGrid Energy
@@ -425,61 +382,10 @@ export default function App() {
   const [reviewCategory, setReviewCategory] = useState('All Installs');
   const [carouselIndex, setCarouselIndex] = useState(0);
 
-  const testimonials = [
-    {
-      category: 'Residential',
-      name: 'Dr. Jonathan & Claire Mercer',
-      location: 'Scottsdale, AZ',
-      systemSpecs: '14.8 kW Architectural Array + 2x Powerwall',
-      billBefore: '$540/mo',
-      billAfter: '$14/mo',
-      savingsPct: '97% Bill Drop',
-      quote:
-        'HelioGrid’s all-black low-profile panels look like custom architectural glass on our roof. During July’s 115°F heatwave and a 9-hour neighborhood grid outage, our AC and pool ran seamlessly off Powerwall storage.',
-      date: 'Installed 4 months ago • Verified NABCEP Project'
-    },
-    {
-      category: 'Battery Backup',
-      name: 'Marcus & Hannah Vance',
-      location: 'Austin, TX',
-      systemSpecs: '11.6 kW Tier-1 Solar + 27 kWh Whole-Home Storage',
-      billBefore: '$415/mo',
-      billAfter: '$19/mo',
-      savingsPct: '95% Bill Drop',
-      quote:
-        'After two winter ice storms knocked out power on our street, we wanted true energy independence. HelioGrid handled every HOA approval, city permit, and utility interconnection in 18 days—and completed installation in a single day.',
-      date: 'Installed 6 months ago • Verified Tesla Premier Install'
-    },
-    {
-      category: 'Commercial',
-      name: 'Apex Cold-Chain Logistics (CFO: David Lin)',
-      location: 'Ontario, CA',
-      systemSpecs: '185 kW Flat-Roof Ballasted Array + Commercial Storage',
-      billBefore: '$6,850/mo',
-      billAfter: '$610/mo',
-      savingsPct: '91% OpEx Drop',
-      quote:
-        'Between the 30% Federal ITC, accelerated MACRS depreciation, and peak demand-charge shaving, our warehouse solar array achieved a 3.4-year net payback and adds over $74,000/yr straight to EBITDA.',
-      date: 'Commissioned Q2 • Commercial Turnkey Division'
-    },
-    {
-      category: 'Residential',
-      name: 'Sophia & Liam Alvarez',
-      location: 'San Diego, CA',
-      systemSpecs: '9.2 kW Microinverter Roof + 1x Powerwall 3',
-      billBefore: '$380/mo',
-      billAfter: '$22/mo',
-      savingsPct: '94% Bill Drop',
-      quote:
-        'Three other installers told us our Spanish tile roof was too complex. HelioGrid used LiDAR 3D drone modeling to engineer zero-leak flashed mounts and cut our SDG&E bill by more than $4,200 in year one.',
-      date: 'Installed 8 months ago • Verified Google 5★ Review'
-    }
-  ];
-
   const filteredTestimonials =
     reviewCategory === 'All Installs'
-      ? testimonials
-      : testimonials.filter((t) => t.category === reviewCategory);
+      ? solarTestimonials
+      : solarTestimonials.filter((t) => t.category === reviewCategory);
 
   const safeCarouselIndex =
     filteredTestimonials.length > 0 ? carouselIndex % filteredTestimonials.length : 0;
@@ -498,8 +404,6 @@ export default function App() {
   // =========================================================================
   // 5. TURNKEY TIMELINE & ACCESSIBLE FAQ ACCORDION
   // =========================================================================
-  const [openFaqIdx, setOpenFaqIdx] = useState(0);
-
   const turnkeySteps = [
     {
       step: '01',
@@ -528,25 +432,6 @@ export default function App() {
       duration: '25-Yr Warranty',
       desc: 'Following final utility Permission to Operate (PTO), track real-time solar generation, battery reserve, and grid export credits from your phone.',
       icon: Activity
-    }
-  ];
-
-  const faqItems = [
-    {
-      q: 'Will solar mounting penetrations void my roof warranty or cause leaks?',
-      a: 'Never. HelioGrid uses triple-sealed, flashing-integrated aerospace aluminum mounts engineered for wind loads up to 160 mph. Every roof attachment is backed by our 25-Year Zero-Leak Roof Penetration Warranty in addition to your existing roofing manufacturer coverage.'
-    },
-    {
-      q: 'How does the 30% Federal Solar Tax Credit (ITC) work in 2026?',
-      a: 'Under the Residential & Commercial Clean Energy Credit, you can deduct 30% of your total installed solar and battery storage cost dollar-for-dollar from your federal tax liability. If you choose our $0-down solar loan, you can apply your 30% tax credit directly toward the principal within 18 months to keep monthly payments low.'
-    },
-    {
-      q: 'Do solar panels still power my home during a utility grid blackout?',
-      a: 'Standard grid-tied solar without batteries automatically shuts off during a blackout to protect utility lineworkers. When paired with Tesla Powerwall or Enphase IQ Battery storage, your home seamlessly islands in under 20 milliseconds—keeping HVAC, refrigeration, Wi-Fi, and EV chargers running indefinitely via solar recharge.'
-    },
-    {
-      q: 'How do Net Metering and Time-of-Use (TOU) battery arbitrage lower my bill?',
-      a: 'During peak midday sun, excess solar energy charges your battery and exports credits to the utility grid. During expensive evening peak rate hours (4 PM – 9 PM), your smart inverter automatically powers your home from stored solar energy so you avoid peak utility tariffs.'
     }
   ];
 
@@ -1941,56 +1826,7 @@ export default function App() {
             })}
           </div>
 
-          {/* Accessible Buyer Objection FAQ Accordion */}
-          <div className="mx-auto max-w-3xl">
-            <RevealSection className="text-center mb-10">
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-amber-600">
-                Engineering &amp; Tax Credit Answers
-              </span>
-              <h3 className="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0F172A]">
-                Frequently Asked Questions
-              </h3>
-            </RevealSection>
-
-            <div className="space-y-3.5">
-              {faqItems.map((faq, idx) => {
-                const isOpen = openFaqIdx === idx;
-                return (
-                  <RevealSection key={idx} delay={idx * 60}>
-                    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-[#FAF9F6]">
-                      <button
-                        type="button"
-                        onClick={() => setOpenFaqIdx(isOpen ? -1 : idx)}
-                        aria-expanded={isOpen}
-                        className="flex w-full items-center justify-between gap-4 p-5 text-left text-sm sm:text-base font-extrabold text-[#0F172A] cursor-pointer"
-                      >
-                        <span>{faq.q}</span>
-                        <ChevronDown
-                          className={`h-5 w-5 text-amber-600 shrink-0 transition-transform duration-300 ${
-                            isOpen ? 'rotate-180' : ''
-                          }`}
-                        />
-                      </button>
-
-                      <div
-                        className={`grid transition-all duration-300 ease-in-out ${
-                          isOpen
-                            ? 'grid-rows-[1fr] opacity-100'
-                            : 'grid-rows-[0fr] opacity-0'
-                        }`}
-                      >
-                        <div className="overflow-hidden">
-                          <p className="px-5 pb-5 text-xs sm:text-sm leading-relaxed text-slate-600">
-                            {faq.a}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </RevealSection>
-                );
-              })}
-            </div>
-          </div>
+          <FaqSection />
         </div>
       </section>
 

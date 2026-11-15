@@ -8,5 +8,5 @@
     "strict": false,
     "skipLibCheck": true
   },
-  "include": ["*.tsx"]
+  "include": ["main.tsx", "src/**/*.ts", "src/**/*.tsx"]
 }
