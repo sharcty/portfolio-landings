@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { pageRoutes } from './pageRoutes';
+import PageMetadata from './PageMetadata';
 
 function HomePage() {
   return (
@@ -47,6 +48,7 @@ function NotFoundPage() {
 export default function App() {
   return (
     <BrowserRouter>
+      <PageMetadata />
       <Suspense fallback={<div className="p-8 text-slate-500">Loading page...</div>}>
         <Routes>
           <Route path="/" element={<HomePage />} />
