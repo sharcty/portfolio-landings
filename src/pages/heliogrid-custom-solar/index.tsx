@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
+  Building2,
+  Home,
+  Landmark,
   Sun,
   BatteryCharging,
   ShieldCheck,
@@ -15,9 +18,6 @@ import {
   ChevronDown,
   Menu,
   X,
-  Home,
-  Building2,
-  Landmark,
   Zap,
   Award,
   TrendingDown,
@@ -33,6 +33,30 @@ import {
 import RevealSection from '../../shared/RevealSection';
 import FaqSection from './FaqSection';
 import { solarTestimonials, turnkeySteps } from './data';
+import {
+  calculateQuoteProposal,
+  calculateSolarFinancialModel,
+  getPreviousQuoteStep,
+  getQuotePhoneDigits,
+  getQuoteStepTransition,
+  isValidQuoteAddress,
+  isValidQuoteEmail,
+  isValidQuoteName,
+  isValidQuotePhone,
+  isValidQuoteZip,
+  quoteBatteryOptions,
+  quotePropertyOptions,
+  type QuoteBatteryOption,
+  type QuoteField,
+  type QuotePropertyType,
+  type QuoteStep
+} from './quoteLogic';
+
+const propertyIcons = {
+  home: Home,
+  landmark: Landmark,
+  building: Building2
+} as const;
 
 /**
  * Custom Architectural Sun-Grid SVG Brand Logo for HelioGrid Energy
@@ -149,116 +173,63 @@ export default function App() {
   // =========================================================================
   // 2. MULTI-STEP LEAD CAPTURE & ROOF FEASIBILITY FORM STATE
   // =========================================================================
-  const [quoteStep, setQuoteStep] = useState(1); // 1..4, 5 = submitted confirmation
-  const [propertyType, setPropertyType] = useState('Single-Family Home');
+  const [quoteStep, setQuoteStep] = useState<QuoteStep>(1);
+  const [propertyType, setPropertyType] =
+    useState<QuotePropertyType>('Single-Family Home');
   const [roofCondition, setRoofCondition] = useState('Asphalt Shingle • Under 10 Yrs');
   const [quoteMonthlyBill, setQuoteMonthlyBill] = useState(340);
-  const [quoteBatteryOption, setQuoteBatteryOption] = useState('1x Powerwall (13.5 kWh)');
+  const [quoteBatteryOption, setQuoteBatteryOption] =
+    useState<QuoteBatteryOption>('1x Powerwall (13.5 kWh)');
   const [streetAddress, setStreetAddress] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [stepError, setStepError] = useState('');
-  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
+  const [touchedFields, setTouchedFields] = useState<
+    Partial<Record<QuoteField, boolean>>
+  >({});
 
   const quoteCardRef = useRef(null);
 
   // Instant Validation Checks
-  const isZipValid = /^\d{5}$/.test(zipCode.trim());
-  const isAddressValid = streetAddress.trim().length >= 5;
-  const isNameValid = fullName.trim().length >= 2;
-  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const phoneDigits = phone.replace(/\D/g, '');
-  const isPhoneValid = phoneDigits.length === 10;
+  const isZipValid = isValidQuoteZip(zipCode);
+  const isAddressValid = isValidQuoteAddress(streetAddress);
+  const isNameValid = isValidQuoteName(fullName);
+  const isEmailValid = isValidQuoteEmail(email);
+  const phoneDigits = getQuotePhoneDigits(phone);
+  const isPhoneValid = isValidQuotePhone(phone);
 
   const detectedIrradiance = useMemo(() => getSolarIrradianceZone(zipCode.trim()), [zipCode]);
 
   // Calculated Personalized Proposal Summary from Multi-Step Inputs
-  const proposalMetrics = useMemo(() => {
-    const propertyMultiplier =
-      propertyType === 'Commercial Facility'
-        ? 1.25
-        : propertyType === 'Luxury Estate'
-        ? 1.12
-        : 1.0;
-
-    const rawKw = (quoteMonthlyBill / 28) * propertyMultiplier;
-    const systemSizeKw = Number(Math.max(4.8, rawKw).toFixed(1));
-
-    const batteryCost =
-      quoteBatteryOption === '2x Whole-Home Backup'
-        ? 21500
-        : quoteBatteryOption === '1x Powerwall (13.5 kWh)'
-        ? 11800
-        : 0;
-
-    const grossSystemCost = Math.round(systemSizeKw * 2850 + batteryCost);
-    const federalItcCredit = Math.round(grossSystemCost * 0.3);
-    const netSystemCost = grossSystemCost - federalItcCredit;
-    const estimatedMonthlySavings = Math.round(quoteMonthlyBill * 0.86);
-
-    return {
-      systemSizeKw,
-      grossSystemCost,
-      federalItcCredit,
-      netSystemCost,
-      estimatedMonthlySavings
-    };
-  }, [propertyType, quoteMonthlyBill, quoteBatteryOption]);
+  const proposalMetrics = useMemo(
+    () => calculateQuoteProposal(propertyType, quoteMonthlyBill, quoteBatteryOption),
+    [propertyType, quoteMonthlyBill, quoteBatteryOption]
+  );
 
   const handleNextQuoteStep = () => {
-    setStepError('');
-
-    if (quoteStep === 1) {
-      if (!propertyType || !roofCondition) {
-        setStepError('Please select your property type and roof condition.');
-        return;
-      }
-      setQuoteStep(2);
-      return;
-    }
-
-    if (quoteStep === 2) {
-      setQuoteStep(3);
-      return;
-    }
-
-    if (quoteStep === 3) {
-      setTouchedFields((prev) => ({ ...prev, streetAddress: true, zipCode: true }));
-      if (!isAddressValid) {
-        setStepError('Please enter a valid street address (at least 5 characters).');
-        return;
-      }
-      if (!isZipValid) {
-        setStepError('Please enter a valid 5-digit US ZIP code.');
-        return;
-      }
-      setQuoteStep(4);
-      return;
-    }
-
-    if (quoteStep === 4) {
+    const transition = getQuoteStepTransition(quoteStep, {
+      propertyType,
+      roofCondition,
+      streetAddress,
+      zipCode,
+      fullName,
+      email,
+      phone
+    });
+    setStepError(transition.error);
+    if (transition.touchedFields.length > 0) {
       setTouchedFields((prev) => ({
         ...prev,
-        fullName: true,
-        email: true,
-        phone: true
+        ...transition.touchedFields.reduce<Partial<Record<QuoteField, boolean>>>(
+          (touched, field) => ({ ...touched, [field]: true }),
+          {}
+        )
       }));
-      if (!isNameValid) {
-        setStepError('Please enter your full name.');
-        return;
-      }
-      if (!isEmailValid) {
-        setStepError('Please enter a valid email address for your 3D roof report.');
-        return;
-      }
-      if (!isPhoneValid) {
-        setStepError('Please enter a complete 10-digit phone number.');
-        return;
-      }
-
-      setQuoteStep(5);
+    }
+    setQuoteStep(transition.nextStep);
+    if (transition.submitted) {
       showToast('3D LiDAR Roof Audit & Federal ITC Proposal generated!');
     }
   };
@@ -274,68 +245,20 @@ export default function App() {
   // =========================================================================
   const [estMonthlySpend, setEstMonthlySpend] = useState(360);
   const [utilityInflationRate, setUtilityInflationRate] = useState(6); // 4%, 6%, 8%
-  const [paymentMode, setPaymentMode] = useState('loan'); // 'loan' | 'cash'
+  const [paymentMode, setPaymentMode] = useState<'loan' | 'cash'>('loan');
   const [includeStorage, setIncludeStorage] = useState(true);
   const [hoveredYearIdx, setHoveredYearIdx] = useState(null);
 
-  const financialModel = useMemo(() => {
-    const estKw = Math.max(5.2, estMonthlySpend / 27);
-    const storageAddon = includeStorage ? 11800 : 0;
-    const grossCost = estKw * 2800 + storageAddon;
-    const federalCredit = Math.round(grossCost * 0.3);
-    const netCost = grossCost - federalCredit;
-
-    // Year-1 Bill Reduction %
-    const year1ReductionPct = includeStorage ? 91 : 84;
-
-    // Monthly solar payment if $0-down 25-yr 4.99% solar loan (with 30% ITC applied)
-    const monthlyLoanPayment = Math.round((netCost * 0.00584));
-
-    const yearsData = [];
-    let cumulativeUtilityNoSolar = 0;
-    let cumulativeHelioGrid = paymentMode === 'cash' ? netCost : 0;
-    let paybackYear = null;
-
-    for (let yr = 1; yr <= 25; yr++) {
-      const annualUtilityNoSolar =
-        estMonthlySpend * 12 * Math.pow(1 + utilityInflationRate / 100, yr - 1);
-      cumulativeUtilityNoSolar += annualUtilityNoSolar;
-
-      const residualUtilityBill = annualUtilityNoSolar * (1 - year1ReductionPct / 100);
-      const annualSolarCost =
-        paymentMode === 'loan'
-          ? monthlyLoanPayment * 12 + residualUtilityBill
-          : residualUtilityBill;
-
-      cumulativeHelioGrid += annualSolarCost;
-
-      if (paybackYear === null && cumulativeUtilityNoSolar >= cumulativeHelioGrid) {
-        paybackYear = yr;
-      }
-
-      yearsData.push({
-        year: yr,
-        noSolarCum: Math.round(cumulativeUtilityNoSolar),
-        solarCum: Math.round(cumulativeHelioGrid),
-        netSavings: Math.round(cumulativeUtilityNoSolar - cumulativeHelioGrid)
-      });
-    }
-
-    const finalYear = yearsData[yearsData.length - 1];
-    const computedPayback =
-      paymentMode === 'loan' ? 'Immediate (Day 1)' : `${paybackYear || 6}.4 Yrs`;
-
-    return {
-      estKw: estKw.toFixed(1),
-      federalCredit,
-      netCost: Math.round(netCost),
-      year1ReductionPct,
-      net25YearSavings: Math.max(0, finalYear.netSavings),
-      paybackLabel: computedPayback,
-      monthlyLoanPayment,
-      yearsData
-    };
-  }, [estMonthlySpend, utilityInflationRate, paymentMode, includeStorage]);
+  const financialModel = useMemo(
+    () =>
+      calculateSolarFinancialModel(
+        estMonthlySpend,
+        utilityInflationRate,
+        paymentMode,
+        includeStorage
+      ),
+    [estMonthlySpend, utilityInflationRate, paymentMode, includeStorage]
+  );
 
   // Custom SVG Chart Geometry for 25-Year Cumulative Cost Comparison
   const svgW = 680;
@@ -700,24 +623,8 @@ export default function App() {
                         </p>
 
                         <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          {[
-                            {
-                              id: 'Single-Family Home',
-                              sub: 'Pitched or Flat Roof',
-                              icon: Home
-                            },
-                            {
-                              id: 'Luxury Estate',
-                              sub: 'High-Load + EV / Pool',
-                              icon: Landmark
-                            },
-                            {
-                              id: 'Commercial Facility',
-                              sub: 'Warehouse / Office / HOA',
-                              icon: Building2
-                            }
-                          ].map((item) => {
-                            const Icon = item.icon;
+                          {quotePropertyOptions.map((item) => {
+                            const Icon = propertyIcons[item.iconName];
                             const selected = propertyType === item.id;
                             return (
                               <button
@@ -824,23 +731,7 @@ export default function App() {
                           Battery Backup &amp; Blackout Protection
                         </label>
                         <div className="space-y-2.5">
-                          {[
-                            {
-                              id: 'None',
-                              title: 'Solar Only (Grid-Tied Net Metering)',
-                              badge: 'Lowest Upfront Cost'
-                            },
-                            {
-                              id: '1x Powerwall (13.5 kWh)',
-                              title: '1x Powerwall (13.5 kWh Essential Backup)',
-                              badge: 'Most Popular'
-                            },
-                            {
-                              id: '2x Whole-Home Backup',
-                              title: '2x Whole-Home Backup (27 kWh + Central AC)',
-                              badge: '100% Off-Grid Ready'
-                            }
-                          ].map((bat) => {
+                          {quoteBatteryOptions.map((bat) => {
                             const active = quoteBatteryOption === bat.id;
                             return (
                               <button
@@ -1154,7 +1045,7 @@ export default function App() {
                           type="button"
                           onClick={() => {
                             setStepError('');
-                            setQuoteStep((prev) => prev - 1);
+                            setQuoteStep((prev) => getPreviousQuoteStep(prev));
                           }}
                           className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-xs sm:text-sm font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
                         >
