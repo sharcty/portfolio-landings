@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getPageMetadata, pageMetadata, pageRoutes } from './pageRoutes';
+import { getHeroTabs } from '../pages/veloce-ai/data';
 
 describe('portfolio page routes', () => {
   it('defines unique, non-root paths with a title for every landing', () => {
@@ -33,5 +34,14 @@ describe('portfolio page routes', () => {
   it('provides home and not-found metadata', () => {
     expect(getPageMetadata('/')).toEqual(pageMetadata.home);
     expect(getPageMetadata('/missing-page')).toEqual(pageMetadata.notFound);
+  });
+
+  it('keeps hero demo data responsive to simulation state', () => {
+    const firstSimulation = getHeroTabs(1);
+    const nextSimulation = getHeroTabs(2);
+
+    expect(firstSimulation.scoring.metric1Value).toBe('1,428');
+    expect(nextSimulation.scoring.metric1Value).toBe('1,594');
+    expect(firstSimulation.forecast.rows).toHaveLength(3);
   });
 });

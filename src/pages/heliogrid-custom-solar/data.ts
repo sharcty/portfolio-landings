@@ -1,3 +1,5 @@
+import { Activity, FileCheck2, Sun, Wrench } from 'lucide-react';
+
 export const solarTestimonials = [
   {
     category: 'Residential',
@@ -67,3 +69,34 @@ export const solarFaqItems = [
     a: 'During peak midday sun, excess solar energy charges your battery and exports credits to the utility grid. During expensive evening peak rate hours (4 PM – 9 PM), your smart inverter automatically powers your home from stored solar energy so you avoid peak utility tariffs.'
   }
 ] as const;
+
+export const turnkeySteps = [
+    {
+      step: '01',
+      title: 'LiDAR 3D Roof & Shade Audit',
+      duration: '24 Hours',
+      desc: 'Satellite & LiDAR irradiance modeling maps sun-path angles, roof pitch, and panel placement with 99.2% production accuracy.',
+      icon: Sun
+    },
+    {
+      step: '02',
+      title: 'Permitting & Utility Interconnection',
+      duration: 'Days 2–14',
+      desc: 'Our in-house engineering team handles structural stamps, HOA architectural packets, city permits, and utility net-metering applications.',
+      icon: FileCheck2
+    },
+    {
+      step: '03',
+      title: '1-Day White-Glove Installation',
+      duration: '1 Day On-Site',
+      desc: 'NABCEP-certified master electricians install Tier-1 all-black panels, concealed attic conduit, and battery storage with zero exposed wiring.',
+      icon: Wrench
+    },
+    {
+      step: '04',
+      title: 'PTO Activation & 24/7 Monitoring',
+      duration: '25-Yr Warranty',
+      desc: 'Following final utility Permission to Operate (PTO), track real-time solar generation, battery reserve, and grid export credits from your phone.',
+      icon: Activity
+    }
+  ];

@@ -32,7 +32,7 @@ import {
 } from 'lucide-react';
 import RevealSection from '../../shared/RevealSection';
 import FaqSection from './FaqSection';
-import { solarTestimonials } from './data';
+import { solarTestimonials, turnkeySteps } from './data';
 
 /**
  * Custom Architectural Sun-Grid SVG Brand Logo for HelioGrid Energy
@@ -404,36 +404,6 @@ export default function App() {
   // =========================================================================
   // 5. TURNKEY TIMELINE & ACCESSIBLE FAQ ACCORDION
   // =========================================================================
-  const turnkeySteps = [
-    {
-      step: '01',
-      title: 'LiDAR 3D Roof & Shade Audit',
-      duration: '24 Hours',
-      desc: 'Satellite & LiDAR irradiance modeling maps sun-path angles, roof pitch, and panel placement with 99.2% production accuracy.',
-      icon: Sun
-    },
-    {
-      step: '02',
-      title: 'Permitting & Utility Interconnection',
-      duration: 'Days 2–14',
-      desc: 'Our in-house engineering team handles structural stamps, HOA architectural packets, city permits, and utility net-metering applications.',
-      icon: FileCheck2
-    },
-    {
-      step: '03',
-      title: '1-Day White-Glove Installation',
-      duration: '1 Day On-Site',
-      desc: 'NABCEP-certified master electricians install Tier-1 all-black panels, concealed attic conduit, and battery storage with zero exposed wiring.',
-      icon: Wrench
-    },
-    {
-      step: '04',
-      title: 'PTO Activation & 24/7 Monitoring',
-      duration: '25-Yr Warranty',
-      desc: 'Following final utility Permission to Operate (PTO), track real-time solar generation, battery reserve, and grid export credits from your phone.',
-      icon: Activity
-    }
-  ];
 
   // Bottom CTA Quick ZIP jump to Hero Multi-Step Form
   const [footerZipInput, setFooterZipInput] = useState('');
