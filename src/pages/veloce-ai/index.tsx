@@ -958,7 +958,7 @@ export default function App() {
       {/* =====================================================================
           3. ENTERPRISE SOCIAL PROOF STRIP
          ===================================================================== */}
-      <RevealSection>
+      <RevealSection threshold={0.1}>
         <section
           className={`border-y py-10 ${
             isDark
@@ -1027,7 +1027,7 @@ export default function App() {
          ===================================================================== */}
       <section id="features" className="py-20 sm:py-28 scroll-mt-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <RevealSection className="mx-auto max-w-2xl text-center mb-14">
+          <RevealSection threshold={0.1} className="mx-auto max-w-2xl text-center mb-14">
             <span className="text-xs font-semibold uppercase tracking-widest text-indigo-500">
               Engineered for Scale
             </span>
@@ -1050,7 +1050,7 @@ export default function App() {
           {/* Asymmetric 3-Column Bento Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* BENTO CARD 1 (2-Col Span): Interactive Real-Time Revenue & Conversion Chart */}
-            <RevealSection className="lg:col-span-2">
+            <RevealSection threshold={0.1} className="lg:col-span-2">
               <div
                 className={`group relative h-full overflow-hidden rounded-2xl border p-6 sm:p-8 transition-all duration-300 hover:border-indigo-500/50 ${
                   isDark
@@ -1147,7 +1147,7 @@ export default function App() {
             </RevealSection>
 
             {/* BENTO CARD 2 (1-Col): Sub-50ms Edge Latency & SOC2 Type II Security */}
-            <RevealSection delay={100}>
+            <RevealSection threshold={0.1} delay={100}>
               <div
                 className={`group h-full flex flex-col justify-between rounded-2xl border p-6 sm:p-8 transition-all duration-300 hover:border-indigo-500/50 ${
                   isDark
@@ -1212,7 +1212,7 @@ export default function App() {
             </RevealSection>
 
             {/* BENTO CARD 3 (1-Col): One-Click Stack Integrations with Hover Tooltips */}
-            <RevealSection delay={150}>
+            <RevealSection threshold={0.1} delay={150}>
               <div
                 className={`group h-full flex flex-col justify-between rounded-2xl border p-6 sm:p-8 transition-all duration-300 hover:border-indigo-500/50 ${
                   isDark
@@ -1281,7 +1281,7 @@ export default function App() {
             </RevealSection>
 
             {/* BENTO CARD 4 (2-Col Span): Live Collaborative AI Agent Activity Feed */}
-            <RevealSection delay={200} className="lg:col-span-2">
+            <RevealSection threshold={0.1} delay={200} className="lg:col-span-2">
               <div
                 className={`group h-full flex flex-col justify-between rounded-2xl border p-6 sm:p-8 transition-all duration-300 hover:border-indigo-500/50 ${
                   isDark
@@ -1374,7 +1374,7 @@ export default function App() {
         }`}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <RevealSection className="mx-auto max-w-2xl text-center">
+          <RevealSection threshold={0.1} className="mx-auto max-w-2xl text-center">
             <span className="text-xs font-semibold uppercase tracking-widest text-indigo-500">
               Transparent Usage Scaling
             </span>
@@ -1439,7 +1439,7 @@ export default function App() {
                 billingCycle === 'annual' ? tier.annualPrice : tier.monthlyPrice;
 
               return (
-                <RevealSection key={tier.name} delay={idx * 100}>
+                <RevealSection key={tier.name} threshold={0.1} delay={idx * 100}>
                   <div
                     className={`relative flex h-full flex-col justify-between rounded-2xl p-7 sm:p-8 transition-all duration-300 ${
                       tier.popular
@@ -1542,7 +1542,7 @@ export default function App() {
          ===================================================================== */}
       <section id="faq" className="py-20 sm:py-28 scroll-mt-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <RevealSection className="text-center mb-12">
+          <RevealSection threshold={0.1} className="text-center mb-12">
             <span className="text-xs font-semibold uppercase tracking-widest text-indigo-500">
               Technical & Security FAQ
             </span>
@@ -1559,7 +1559,7 @@ export default function App() {
             {faqItems.map((item, idx) => {
               const isOpen = openFaqIndex === idx;
               return (
-                <RevealSection key={idx} delay={idx * 60}>
+                <RevealSection key={idx} threshold={0.1} delay={idx * 60}>
                   <div
                     className={`overflow-hidden rounded-2xl border transition-colors ${
                       isDark
@@ -1615,7 +1615,7 @@ export default function App() {
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Gradient CTA Banner */}
-          <RevealSection>
+          <RevealSection threshold={0.1}>
             <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-700 p-8 sm:p-12 text-white shadow-2xl shadow-indigo-500/20 mb-16">
               <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 text-center lg:text-left">
                 <div className="max-w-xl">

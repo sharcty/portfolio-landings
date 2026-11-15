@@ -1,35 +1,19 @@
-import { useEffect, useRef, useState, type HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
+import { DEFAULT_REVEAL_THRESHOLD, useScrollReveal } from './useScrollReveal';
 
 type RevealSectionProps = HTMLAttributes<HTMLDivElement> & {
   delay?: number;
+  threshold?: number | number[];
 };
 
 export default function RevealSection({
   children,
   className = '',
   delay = 0,
+  threshold = DEFAULT_REVEAL_THRESHOLD,
   ...divProps
 }: RevealSectionProps) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(node);
-        }
-      },
-      { threshold: 0.08 }
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
+  const [ref, isVisible] = useScrollReveal<HTMLDivElement>(threshold);
 
   return (
     <div
